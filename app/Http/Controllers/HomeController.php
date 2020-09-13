@@ -53,8 +53,8 @@ class HomeController extends Controller
         # Verify if signature is valid
         $result = EllipticCurve\Ecdsa::verify($abstract[0], $signature, $publicKey);
 
-        $employee = DataEmployee::all();
+        // $employee = DataEmployee::all();
         
-        return view('home', ['data'=> $employee, 'text'=> $result]);
+        return view('home', ['text'=> $result]);
     }
 }

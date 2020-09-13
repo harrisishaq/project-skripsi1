@@ -32,7 +32,7 @@
                     </div>
                 </div>
 
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <div class="table-responsive" id="users-table-wrapper">
                         <table class="table table-striped table-borderless fixed" id="datatable">
                             <thead>
@@ -68,7 +68,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
