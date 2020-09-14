@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Smalot\PdfParser\Parser;
 use App\DataEmployee;
-use EllipticCurve\PrivateKey;
+//use EllipticCurve\PrivateKey;
 use Elliptic\EC;
 
 class HomeController extends Controller
@@ -43,18 +43,33 @@ class HomeController extends Controller
         $abstract = explode("Keyword", $text[1]);
         // dd($text);
 
-        $privateKey = new EllipticCurve\PrivateKey;
-        $publicKey = $privateKey->publicKey();
+        // $privateKey = new EllipticCurve\PrivateKey;
+        // $publicKey = $privateKey->publicKey();
         
 
-        # Generate Signature
-        $signature = EllipticCurve\Ecdsa::sign($abstract[0], $privateKey);
+        // # Generate Signature
+        // $signature = EllipticCurve\Ecdsa::sign($abstract[0], $privateKey);
 
-        # Verify if signature is valid
-        $result = EllipticCurve\Ecdsa::verify($abstract[0], $signature, $publicKey);
+        // # Verify if signature is valid
+        // $result = EllipticCurve\Ecdsa::verify($abstract[0], $signature, $publicKey);
+
+
+        $ec = new EC('secp256k1');
+        // Generate keys
+        $key = $ec->genKeyPair();
+
+        // Sign message (can be hex sequence or array)
+        $msg = 'ab4c3451';
+        $signature = $key->sign($msg);
+
+        // Export DER encoded signature to hex string
+        $derSign = $signature->toDER('hex');
+
+        // Verify signature
+        echo "Verified: " . (($key->verify($msg, $derSign) == TRUE) ? "true" : "false") . "\n";
 
         // $employee = DataEmployee::all();
         
-        return view('home', ['text'=> $result]);
+        return view('home', ['text'=> $abstract]);
     }
 }
