@@ -7,6 +7,7 @@ use Smalot\PdfParser\Parser;
 use App\DataEmployee;
 //use EllipticCurve\PrivateKey;
 use Elliptic\EC;
+use kornrunner\Keccak;
 
 class HomeController extends Controller
 {
@@ -39,35 +40,33 @@ class HomeController extends Controller
         
         // Extract ALL text with the getText method
         $old_text = $pdf->getText();
+        //var_dump($old_text);
         $text = explode("Abstract", $old_text);
-        $abstract = explode("Keyword", $text[1]);
-        // dd($text);
-
-        // $privateKey = new EllipticCurve\PrivateKey;
-        // $publicKey = $privateKey->publicKey();
-        
-
-        // # Generate Signature
-        // $signature = EllipticCurve\Ecdsa::sign($abstract[0], $privateKey);
-
-        // # Verify if signature is valid
-        // $result = EllipticCurve\Ecdsa::verify($abstract[0], $signature, $publicKey);
-
-
+        $abstract = explode("Keyword", $text[1]);        
+        //initial ECDSA
         $ec = new EC('secp256k1');
-        // Generate keys
-        $key = $ec->genKeyPair();
-
+        // Hashing abstract use sha1
+        $hashAbstract = sha1($abstract[0]);
+        // Hashing abstract use keccak
+        $hashAbstractKeccak = Keccak::hash($abstract[0], 224);
+        var_dump($hashAbstractKeccak);
+        // Generate key from hash we created
+        $privateKey = $ec->keyFromPrivate($hashAbstract);
         // Sign message (can be hex sequence or array)
-        $msg = 'ab4c3451';
-        $signature = $key->sign($msg);
-
+        $msg = $abstract;
+        $signature = $privateKey->sign($msg);
         // Export DER encoded signature to hex string
         $derSign = $signature->toDER('hex');
-
         // Verify signature
-        echo "Verified: " . (($key->verify($msg, $derSign) == TRUE) ? "true" : "false") . "\n";
-
+        $isValid = $privateKey->verify($msg, $derSign);
+        // Generate pub key
+        $pubKey = $privateKey->getPublic(true, "hex");
+        var_dump($pubKey);
+        if ($isValid) {
+            echo "Your key is valid";
+        } else {
+            echo "not valid";
+        }
         // $employee = DataEmployee::all();
         
         return view('home', ['text'=> $abstract]);
